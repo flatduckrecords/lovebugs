@@ -1,6 +1,7 @@
-.bin
-.sld
-.sna
-.lst
-.tmp
-.DS_Store
+*.bin
+*.sld
+*.sna
+*.lst
+*.tmp
+*.tap
+*.DS_Store
