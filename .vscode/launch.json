@@ -1,0 +1,74 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		
+		{
+			"type": "dezog",
+			"request": "launch",
+			"name": "DeZog zsim",
+			"remoteType": "zsim",
+			"zsim": {
+				"Z80N": false,
+				"zxKeyboard": true,
+				"ulaScreen": true,
+				"zxBorderWidth": 20,
+				"visualMemory": true,
+				"cpuLoadInterruptRange": 1,
+				"vsyncInterrupt": true,
+				"cpuFrequency": 3500000.0,
+				"memoryModel": "ZX48K",
+				"skipInterrupt": true,
+				"customCode": {
+					"debug": true,
+					//"jsPath": "myPeripheral.js",
+					//"uiPath": "myUi.html",
+					"timeStep": 100
+				}
+			},
+			"zrcp": {
+				"hostname": "localhost",
+				"port": 10000
+			},
+			//"topOfStack": "Stack_Top",
+			"rootFolder": "${fileDirname}",
+			"disassemblerArgs": {
+				"esxdosRst": true
+			},
+			"load": "${fileDirname}/${fileBasenameNoExtension}.sna",
+			"startAutomatically": true,
+			"preLaunchTask": "sjasmplus",
+			"commandsAfterLaunch": [
+				"-rmv"
+			]			
+		},
+		{
+			"type": "dezog",
+			"request": "launch",
+			"name": "DeZog zrcp",
+			"remoteType": "zrcp",
+			"zrcp": {
+				"hostname": "localhost",
+				"port": 10000,
+				"skipInterrupt": false
+			},
+			"rootFolder": "${fileDirname}",
+			"sjasmplus": [
+				{
+					"path": "${fileDirname}/${fileBasenameNoExtension}.sld",
+					"useFiles": true,
+					//"asm": "sjasmplus",
+					"mainFile": "${fileDirname}/${fileBasenameNoExtension}.asm"
+				}
+			],
+			"disassemblerArgs": {
+				"esxdosRst": true
+			},
+			"load": "${fileDirname}/${fileBasenameNoExtension}.sna",
+			"startAutomatically": true,
+			"preLaunchTask": "sjasmplus"
+		}
+	]
+}
