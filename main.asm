@@ -1,7 +1,7 @@
 			DEVICE ZXSPECTRUM48  ; sjasmplus directive for SAVESNA (at end)
 			SLDOPT COMMENT WPMEM, LOGPOINT, ASSERTION
 
-	;DEFINE EMULATOR 1
+	DEFINE EMULATOR 1
 Stack_Top:		EQU 0xFFF0
 
 	IFDEF EMULATOR
@@ -19,9 +19,9 @@ ENTRY
 		EI
 		call ShowTitle
 
-waitk		ld a,(23560)			; read keyboard.
-		cp 32				; is SPACE pressed?
-		jr nz,waitk			; no, wait.
+;waitk		ld a,(23560)			; read keyboard.
+;		cp 32				; is SPACE pressed?
+;		jr nz,waitk			; no, wait.
 		;jr PLAY
 
 		DI
@@ -60,26 +60,38 @@ LOOP:			HALT				; Wait for NMI
 			;HALT
 			
 
-			di
+			;di
 			;call _hellaPlot
 			;call Timer
-			call Clicker
-			call z, CheckForHit
+			;call Clicker
+			;call z, CheckForHit
 
 
 			ld ix, BUGS_TABLE
+			ld iy, SPRITE_TABLE
 			ld b, BT_LENGTH
-bugloop			
-			
-			call show
-			
 
+bugloop			
+			push ix
+			;halt
+;			ld a,b
+;			and 7
+;			out (254), a
+			call show
+		;halt
+			pop ix
 			ld de, BT_WIDTH
 			add ix, de
 			djnz bugloop
-
-;			ld a,1
+;			ld a,7
 ;			out (254), a
+
+
+;			ld a,7
+;			out (254), a
+
+			;call PJ1
+
 
 			;call Peejay
 
@@ -88,21 +100,25 @@ bugloop
 
 ;			call Pointer
 
-;			ld a,3
-;			out (254), a
-			ei
+
+			;ei
 		
 			JR LOOP				; And loop
 
 
 
-Interrupt:		DI
+Interrupt:		
+			DI
+			ex af,af'
 			EXX
 
-			call Mouse
-			call _print
+			call Mouse		; get Mouse_Buttons and Mouse_Coords
+			call _print		; translate coords into screen row/column
+						xor a
+			out (254), a
 			call Reticule
-
+			ld a,7
+			out (254), a
 
 			; update FRAMES. Similar to ROM but only 2 bytes
 			ld hl, (FRAMES)
@@ -110,6 +126,7 @@ Interrupt:		DI
 			ld (FRAMES), hl	
 
 			EXX
+			ex af,af'
 			EI
 			RET
 
@@ -121,9 +138,9 @@ Clicker:		ld a, (Mouse_Buttons)
 			cp 2
 			ret
 Timer: 			
-			ld a, (FRAMES)
-			and %00000100
-			ret z
+			;ld a, (FRAMES)
+			;and %00000100
+			;ret z
 			ld a, (PJ_XY)
 			inc a
 			ld (PJ_XY),a
@@ -134,16 +151,19 @@ show:
 			cp 255			; is bug dead?
 			ret z			; if yes skip this one
 			push bc
-			call display
+			cp 254
+			jr nz, 1F
+			call d1
+			pop bc
+			ret
+1:			call display
 			pop bc
 			ret
 
 move:			ld a,(ix+1)		; alien movement direction.
 			rra			; rotate low bit into carry.
 			jr nc,movav		; no carry ∴ 0 or 2, must be vertical.
-
 						; direction is 1 or 3 so it's horizontal.
-
 			rra			; rotate next bit into carry for test.
 			jr nc,movar		; direction 1 = move alien right.
 
@@ -217,12 +237,19 @@ ShowBuffer:
 Reticule:
 			ld bc,(RET_XY+2)		; OLD position
 			call Get_Char_Address		; get screen address in HL
-			call UND16x16			; HL will be preserved
+			call UND24x16			; HL will be preserved
 			ld bc,(RET_XY)			; NEW position
 			ld (RET_XY+2),bc		; update OLD position
 			call Get_Char_Address		; get screen address in HL
-			ld ix, reticule			; pointer to sprite
-			call MSKD16x16			; draw sprite
+			ld ix, hearticon		; pointer to sprite
+			ld a, (RET_XY+4)		; get x-postion offset
+			and 7				; clip to 7 max
+			jr z,2F				; if zero skip to the end
+			ld b,a				; number of offsets
+			ld de, 96			; amount per offset
+1:			add ix, de			; move sprite pointer by offet amount
+			djnz 1B				; repeat until done
+2:			call MSKD24x16			; draw sprite
 			ret
 
 display:	
@@ -232,24 +259,73 @@ display:
 ;			LD A,(ix+2)		; Current coords
 ;			SUB C			; Subtract from the old coordinate
 ;			RET Z			; If zero, then skip
-
+			ld a, c
+			srl a
+			srl a
+			srl a
+			ld c, a
 			call Get_Char_Address		; get screen address in HL
-			CALL UND16x16			; HL will be preserved
+
 			
-			ld a, (FRAMES)
-			and 8
-			call nz, move
-		;	call move
+			ld de, udr			; stack the return address as if we 
+			push de				; were doing call to a routine.
+			ld e, (ix+11)			; 
+			ld d, (ix+12)			; DE e.g. call UND16x16
+			push de				; stack the sprite routine jump addr
+			;CALL UND24x32
+			ret
+udr:						
+			;ld a, (FRAMES)
+			;and a
+			;call po, move
+			call move
 			
+d1:							; entry point for non-moving sprites
+
+
+			
+			ld de, dr			; stack the return address as if we 
+			push de				; were doing call to a routine.
+			ld e, (ix+9)			; 
+			ld d, (ix+10)			; DE e.g. call MSKD16x16
+			push de				; stack the sprite routine jump addr
+;			
 			ld b,(ix+3)			; NEW position
 			ld c,(ix+2)			; NEW position
-			;ld (ix+4),bc			; update OLD position
-			call Get_Char_Address		; get screen address in HL
-			push ix
-			ld ix, drutt			; pointer to sprite
-			call MSKD16x16			; draw sprite
-			pop ix
-			ret
+
+			ld a, c
+			srl a
+			srl a
+			srl a
+			ld c, a
+			push bc				; stack the columnised position
+			sla a
+			sla a
+			sla a
+			ld c,(ix+2)
+			sub c
+			neg
+			and 7
+			ld de,0				; 
+			jr z,2F				; if zero skip to the end
+			ld b,a				; number of offsets
+			ld hl, 0
+			ld e, (ix+6)			; amount per offset
+1:			add hl, de			; add up sprite pointer offet amount
+			djnz 1B				; repeat until done
+			ex de,hl			; DE=total offset
+
+2:			pop bc				; BC=row/column
+			call Get_Char_Address		; HL=screen address
+			ld c, (ix+7)			; 
+			ld b, (ix+8)			; BC=sprite addr
+			ld ixh, b			; 
+			ld ixl, c			; IX=sprite addr
+			add ix, de			; IX=sprite addr + animation frame
+
+			ret				; use RET to simulate "call SPRITE_ROUTINE"
+dr:							; return from jump
+			ret				; actual RET for this routine
 Pointer:	
 			LD BC,(POSXY+2)		; The previous coords
 			LD A,(POSXY)		; Current coords
@@ -302,11 +378,11 @@ PJ1:			ld bc,(PJ_XY)			; NEW position
 
 
 FRAMES		equ 0x5C78
-PJ_XY		dw 0x4001, 0x4001
+PJ_XY		dw 0x1400, 0x4001
 ENEMY		dw 0x5A00, 0x5A00
 
 POSXY		dw 0x4840, 0x0000
-RET_XY		dw 0x0000, 0x0000
+RET_XY		dw 0x0000, 0x0000, 0x0000
 X_PositionBits: defb 128,64,32,16,8,4,2,1
 
 SPR_BYTES	EQU 16*16/8
@@ -314,14 +390,28 @@ SPR_BYTES	EQU 16*16/8
 
 		;ix+1 = direction 0=left, 1=up, 2=right, 3=down
 
-BT_WIDTH	EQU 7
+BT_WIDTH	EQU 13
 BT_LENGTH	EQU 5
-BUGS_TABLE:	defb 0x00,0x02,3,10,1,29,0
-		defb 0x00,0x00,7,7,5,15,0
-		defb 0x00,0x00,20,20,15,29,0
-		defb 0x00,0x03,15,1,0,20,0
-		defb 0x00,0x01,10,5,0,20,0
+BUGS_TABLE:	defb 0x00,0x03,32,3,0,20,0
+		defw drutt, MSKD16x16, UND16x16
+
+		defb 0x00,0x00,12,17,0,255-24,128
+		defw droog, MSKD32x16, UND32x16
+
+		defb 0x00,0x00,1,20,0,255-24,128
+		defw droog, MSKD32x16, UND32x16
+
+		defb 0xFF,0x03,15,1,0,20,0
+		defw drutt, MSKD16x16, UND16x16
+
+petesprite	defb 0xFE,0x02,0,20,0,29,0
+		defw pj, MSKD24x32, UND24x32
+		
 		defb 0xFF,0,0,0,0,0
+		defw 0x0000, 0x0000
+
+
+SPRITE_TABLE:	DEFW drutt, pj
 BUFFER:		EQU 0X6000	;BLOCK 	32*192/8,0xFF	; 768 bytes to store screen display buffer
 		;BLOCK 	32,0xFF		; 32 bytes to store 16x16 display buffer
 
@@ -346,7 +436,7 @@ BUFFER:		EQU 0X6000	;BLOCK 	32*192/8,0xFF	; 768 bytes to store screen display bu
 
 
 _print:
-		push bc
+;		push bc
 		push de
 ;		ld de,stringx		; location of string
 ;		ld bc,eostrx-stringx	; length of string
@@ -355,12 +445,18 @@ _print:
 		;ld c,d
 		;call 6683
 		ld a,e			; x-coord (0-255)
-		SRL a
-		SRL a
-		SRL a
-		cp 31			; divide by 8 to give screen column (max 30)
+		srl a
+		srl a
+		srl a
+		cp 30			; divide by 8 to give screen column (max 29)
 		jr nc,1F
 		ld (RET_XY),a
+		sla a
+		sla a
+		sla a
+		sub e
+		neg
+		ld (RET_XY+4), a
 ;		ld b,0
 ;		ld c,a
 ;		call 6683
@@ -370,12 +466,18 @@ _print:
 		;ret
 1		ld de,(Mouse_Coords)	; y-coord
 		ld a,d
-		SRL a
-		SRL a
-		SRL a
+		srl a
+		srl a
+		srl a
 		cp 23			; divide by 8 to give screen row (max 21)
 		jr nc,2F
 		ld (RET_XY+1),a
+		sla a
+		sla a
+		sla a
+		sub e
+		neg
+		ld (RET_XY+5), a
 ;		ld b,0
 ;		ld c,a
 ;		call 6683
@@ -384,7 +486,7 @@ _print:
 		;call 11563 ; stack number in bc.
 		;call 11747 ; display top of calc. stack.
 2		pop de
-		pop bc
+;		pop bc
 		ret
 
 stringx defb 22,2,11,'x:'
@@ -398,10 +500,13 @@ eostry  equ $
 	include _mouse.asm
 	include _hellaplot.asm
 
-	include gfx/reticule.asm
+	include gfx/hearticon.asm
 	include gfx/hand.asm
 	include gfx/pj.asm
 	include gfx/drutt.asm
+	include gfx/drutt_v.asm
+	include gfx/droog.asm
+	include gfx/drtest.asm
 LB3	incbin gfx/lovebugs3.scr
 BRICK	incbin gfx/brick.scr
 
@@ -409,8 +514,8 @@ BRICK	incbin gfx/brick.scr
 Code_Length:	EQU $-Code_Start+1
 
 	DISPLAY "Code_Length: ",/D,Code_Length
-	SAVETAP "plot.tap", Code_Start
-	SAVESNA "plot.sna", Code_Start
+	;SAVETAP "plot.tap", Code_Start
+	SAVESNA "main.sna", Code_Start
 	IF 3 == __PASS__
 		DEVICE NONE : ORG 0
 		OUTPUT "file.sna",r
