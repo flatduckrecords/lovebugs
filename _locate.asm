@@ -2,7 +2,7 @@
 ; ENTRY: B=LINE, C=COLUMN
 ; EXIT: HL=address, DE=attr address, A=attr value
 
-DFCC:		EQU	0x5C84		; current print location
+;DFCC:		EQU	0x5C84		; current print location
 
 LOCATE:		LD	A,B
 		AND	0x18
@@ -21,8 +21,8 @@ LOCATE:		LD	A,B
 		ADD	A,C
 		LD	L,A
 		LD	E,A
-		LD	A,(DE)
-		LD	(DFCC),HL
+		;LD	A,(DE)
+		;LD	(DFCC),HL
 		RET
 
 ; Get_Char_Address by Dean Bellfield

@@ -16,6 +16,10 @@ Code_Start:		EQU $8000-4
 	ENDIF
 
 ENTRY
+		EXX
+		ld hl, FRAMES
+		EXX
+
 		EI
 		call ShowTitle
 
@@ -26,23 +30,14 @@ ENTRY
 
 		DI
 		LD SP,Stack_Top
-		LD A,0x00
-		OUT (254),A
-		;CALL Clear_Screen
 		LD HL,Interrupt
-		LD IX,0xFFF0
+		LD IX,Stack_Top
 		LD (IX+04h),0xC3           	; Opcode for JP
 		LD (IX+05h),L
 		LD (IX+06h),H
 		LD (IX+0Fh),0x18           	; Opcode for JR; this will do JR to FFF4h
 		LD A,0x39
 		LD I,A
-		LD SP,0xFFF0
-
-		EXX
-		ld hl, FRAMES
-		EXX
-
 		IM 2
 		EI
 
@@ -55,96 +50,88 @@ PLAY:		call ShowBG
 		;call ShowDrutt
 
 
-LOOP:			HALT				; Wait for NMI
-			;HALT
-			;HALT
+LOOP:			;HALT
 			
 
 			;di
 			;call _hellaPlot
 			;call Timer
-			;call Clicker
+			call Clicker
 			;call z, CheckForHit
 
 
+			halt
 			ld ix, BUGS_TABLE
-			ld iy, SPRITE_TABLE
 			ld b, BT_LENGTH
 
 bugloop			
 			push ix
-			;halt
-;			ld a,b
-;			and 7
-;			out (254), a
+
+			ld a,b
+			out (254),a
+
 			call show
-		;halt
 			pop ix
+
 			ld de, BT_WIDTH
 			add ix, de
 			djnz bugloop
-;			ld a,7
-;			out (254), a
-
-
-;			ld a,7
-;			out (254), a
-
-			;call PJ1
-
-
-			;call Peejay
-
-;			ld a,2
-;			out (254), a
-
-;			call Pointer
-
-
-			;ei
 		
-			JR LOOP				; And loop
+			call Mouse		; get Mouse_Buttons and Mouse_Coords
+			call _print		; translate coords into screen row/column
+		xor a
+		out (254), a
+			call Reticule
+		ld a,7
+		out (254), a
 
+			JR LOOP
 
 
 Interrupt:		
-			DI
-			ex af,af'
+			DI                                      ; Disable interrupts 
+;			PUSH AF                                 ; Save all the registers on the stack
+;			PUSH BC                                 ; This is probably not necessary unless
+;			PUSH DE                                 ; we're looking at returning cleanly
+;			PUSH HL                                 ; back to BASIC at some point
+;			PUSH IX
 			EXX
+;			EX AF,AF'
+;			PUSH AF
+;			PUSH BC
+;			PUSH DE
+;			PUSH HL
+;			PUSH IY
 
-			call Mouse		; get Mouse_Buttons and Mouse_Coords
-			call _print		; translate coords into screen row/column
-						xor a
-			out (254), a
-			call Reticule
-			ld a,7
-			out (254), a
 
 			; update FRAMES. Similar to ROM but only 2 bytes
 			ld hl, (FRAMES)
 			inc hl	
 			ld (FRAMES), hl	
 
+;			POP IY                                  ; Restore all the registers
+;			POP HL
+;			POP DE
+;			POP BC
+;			POP AF
 			EXX
-			ex af,af'
-			EI
-			RET
-
+;			EX AF,AF'
+;			POP IX
+;			POP HL
+;			POP DE
+;			POP BC
+;			POP AF
+			EI                                      ; Enable interrupts
+			RET                                     ; And return
 
 Clicker:		ld a, (Mouse_Buttons)
 			cpl
 			and 3
 			out (254), a
 			cp 2
+			jp z, ShowBuffer
 			ret
-Timer: 			
-			;ld a, (FRAMES)
-			;and %00000100
-			;ret z
-			ld a, (PJ_XY)
-			inc a
-			ld (PJ_XY),a
-			ret
+
 CheckForHit:		ret
 show:
 			ld a,(ix)		; bug table
@@ -232,24 +219,34 @@ ShowBuffer:
 		ld de, 0x4000
 		ld bc, 6144
 		ldir
+		di
+		halt
 		ret
 
 Reticule:
 			ld bc,(RET_XY+2)		; OLD position
-			call Get_Char_Address		; get screen address in HL
-			call UND24x16			; HL will be preserved
+			call LOCATE			; get screen address in HL
+
+			call UND8x8			; HL will be preserved
 			ld bc,(RET_XY)			; NEW position
 			ld (RET_XY+2),bc		; update OLD position
-			call Get_Char_Address		; get screen address in HL
-			ld ix, hearticon		; pointer to sprite
-			ld a, (RET_XY+4)		; get x-postion offset
-			and 7				; clip to 7 max
-			jr z,2F				; if zero skip to the end
-			ld b,a				; number of offsets
-			ld de, 96			; amount per offset
-1:			add ix, de			; move sprite pointer by offet amount
-			djnz 1B				; repeat until done
-2:			call MSKD24x16			; draw sprite
+			call LOCATE			; get screen address in HL
+;			ld a, %00010000			; paint it red!
+;			ld (de), a
+;			inc de
+;			ld (de), a
+;			inc de
+;			ld (de), a
+			ld ix, pointer		; pointer to sprite
+;			ld a, (RET_XY+4)		; get x-postion offset
+;			and 7				; clip to 7 max
+;			jr z,2F				; if zero skip to the end
+;			ld b,a				; number of offsets
+;			ld de, 96			; amount per offset
+;1;:			add ix, de			; move sprite pointer by offet amount
+;			djnz 1B				; repeat until done
+;2:
+			call MSKD8x8			; draw sprite
 			ret
 
 display:	
@@ -264,15 +261,18 @@ display:
 			srl a
 			srl a
 			ld c, a
+			ld a, b
+			srl a
+			srl a
+			srl a
+			ld b, a
 			call Get_Char_Address		; get screen address in HL
 
-			
 			ld de, udr			; stack the return address as if we 
 			push de				; were doing call to a routine.
 			ld e, (ix+11)			; 
 			ld d, (ix+12)			; DE e.g. call UND16x16
 			push de				; stack the sprite routine jump addr
-			;CALL UND24x32
 			ret
 udr:						
 			;ld a, (FRAMES)
@@ -290,15 +290,28 @@ d1:							; entry point for non-moving sprites
 			ld d, (ix+10)			; DE e.g. call MSKD16x16
 			push de				; stack the sprite routine jump addr
 ;			
-			ld b,(ix+3)			; NEW position
-			ld c,(ix+2)			; NEW position
+			ld b,(ix+3)			; NEW position Y
+			ld c,(ix+2)			; NEW position X
 
 			ld a, c
 			srl a
 			srl a
 			srl a
 			ld c, a
+			ld a, b
+			srl a
+			srl a
+			srl a
+			ld b, a
 			push bc				; stack the columnised position
+
+
+			ld a,(ix+1)		; alien movement direction.
+			rra			; rotate low bit into carry.
+			jr c,d_get_y		; no carry ∴ 0 or 2, must be vertical.
+
+			; get x offest
+			ld a, c
 			sla a
 			sla a
 			sla a
@@ -307,7 +320,26 @@ d1:							; entry point for non-moving sprites
 			neg
 			and 7
 			ld de,0				; 
-			jr z,2F				; if zero skip to the end
+			jr z,noffset			; if zero skip to the end
+			ld b,a				; number of offsets
+			ld hl, 0
+			ld e, (ix+6)			; amount per offset
+1:			add hl, de			; add up sprite pointer offet amount
+			djnz 1B				; repeat until done
+			ex de,hl			; DE=total offset
+			jr noffset
+
+d_get_y:		; get y offest
+			ld a, b
+			sla a
+			sla a
+			sla a
+			ld b,(ix+3)
+			sub b
+			neg
+			and 7
+			ld de,0				; 
+			jr z,noffset			; if zero skip to the end
 			ld b,a				; number of offsets
 			ld hl, 0
 			ld e, (ix+6)			; amount per offset
@@ -315,7 +347,8 @@ d1:							; entry point for non-moving sprites
 			djnz 1B				; repeat until done
 			ex de,hl			; DE=total offset
 
-2:			pop bc				; BC=row/column
+
+noffset:		pop bc				; BC=row/column
 			call Get_Char_Address		; HL=screen address
 			ld c, (ix+7)			; 
 			ld b, (ix+8)			; BC=sprite addr
@@ -326,86 +359,37 @@ d1:							; entry point for non-moving sprites
 			ret				; use RET to simulate "call SPRITE_ROUTINE"
 dr:							; return from jump
 			ret				; actual RET for this routine
-Pointer:	
-			LD BC,(POSXY+2)		; The previous coords
-			LD A,(POSXY)		; Current coords
-			SUB C			; Subtract from the old coordinate
-			RET Z			; If zero, then skip
-
-			ld bc,(POSXY+2)			; OLD position
-			call Get_Char_Address		; get screen address in HL
-			CALL UND16x16			; HL will be preserved
-			
-Pnt1:			ld bc,(POSXY)			; NEW position
-			ld (POSXY+2),bc			; update OLD position
-			call Get_Char_Address		; get screen address in HL
-			ld ix, drutt			; pointer to sprite
-			call MSKD16x16			; draw sprite
 			ret
-ShowDrutt:	
-			LD BC,(ENEMY+2)		; The previous coords
-			LD A,(ENEMY)		; Current coords
-			SUB C			; Subtract from the old coordinate
-			RET Z			; If zero, then skip
-
-			ld bc,(ENEMY+2)			; OLD position
-			call Get_Char_Address		; get screen address in HL
-			CALL UND16x16			; HL will be preserved
-			
-Drutt1:			ld bc,(ENEMY)			; NEW position
-			ld (ENEMY+2),bc			; update OLD position
-			call Get_Char_Address		; get screen address in HL
-			ld ix, drutt			; pointer to sprite
-			call MSKD16x16			; draw sprite
-			ret
-
-Peejay	:		
-			LD BC,(PJ_XY+2)		; The previous coords
-			LD A,(PJ_XY)		; Current coords
-			SUB C			; Subtract from the old coordinate
-			RET Z			; If zero, then skip
-
-			;ld bc,(PJ_XY+2)			; OLD position
-			call Get_Char_Address		; get screen address in HL
-			CALL UND24x32			; HL will be preserved
-PJ1:			ld bc,(PJ_XY)			; NEW position
-			ld (PJ_XY+2),bc			; update OLD position
-			call Get_Char_Address		; get screen address in HL
-			ld ix, pj		; pointer to sprite
-			call MSKD24x32			; draw sprite
-			ret
-
 
 
 FRAMES		equ 0x5C78
 PJ_XY		dw 0x1400, 0x4001
 ENEMY		dw 0x5A00, 0x5A00
-
 POSXY		dw 0x4840, 0x0000
 RET_XY		dw 0x0000, 0x0000, 0x0000
 X_PositionBits: defb 128,64,32,16,8,4,2,1
 
 SPR_BYTES	EQU 16*16/8
-;SPR_BYTES	EQU 24*32/8
 
 		;ix+1 = direction 0=left, 1=up, 2=right, 3=down
 
 BT_WIDTH	EQU 13
-BT_LENGTH	EQU 5
-BUGS_TABLE:	defb 0x00,0x03,32,3,0,20,0
-		defw drutt, MSKD16x16, UND16x16
+BT_LENGTH	EQU 6
+BUGS_TABLE:	
+petesprite	defb 0x01,0x02,0,20*8, 0,29*8, 192
+		defw pj_v, MSKD24x32, UND24x32
 
-		defb 0x00,0x00,12,17,0,255-24,128
+		defb 0x00,0x03, 32,3, 0,191-16, 96
+		defw drutt_v, MSKD16x24, UND16x24
+
+		defb 0x00,0x01, 25*8,8, 0,191-16, 96
+		defw drutt_v, MSKD16x24, UND16x24
+
+		defb 0x00,0x00, 12,17*8, 0,255-24, 128
 		defw droog, MSKD32x16, UND32x16
 
-		defb 0x00,0x00,1,20,0,255-24,128
+		defb 0x00,0x02, 1,13*8, 0,255-24, 128
 		defw droog, MSKD32x16, UND32x16
-
-		defb 0xFF,0x03,15,1,0,20,0
-		defw drutt, MSKD16x16, UND16x16
-
-petesprite	defb 0xFE,0x02,0,20,0,29,0
-		defw pj, MSKD24x32, UND24x32
 		
 		defb 0xFF,0,0,0,0,0
 		defw 0x0000, 0x0000
@@ -500,9 +484,11 @@ eostry  equ $
 	include _mouse.asm
 	include _hellaplot.asm
 
+	include gfx/pointer.asm
 	include gfx/hearticon.asm
 	include gfx/hand.asm
 	include gfx/pj.asm
+	include gfx/pj_v.asm
 	include gfx/drutt.asm
 	include gfx/drutt_v.asm
 	include gfx/droog.asm

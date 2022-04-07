@@ -1,0 +1,121 @@
+; ASM source file created by SevenuP v1.20
+; SevenuP (C) Copyright 2002-2006 by Jaime Tejedor Gomez, aka Metalbrain
+
+;GRAPHIC DATA:
+;Pixel Size:      ( 16,  24)
+;Char Size:       (  2,   3)
+;Frames:             9
+;Sort Priorities: Mask, X char, Char line, Y char, Frame number
+;Data Outputted:  Gfx
+;Interleave:      Line
+;Mask:            Yes
+
+drutt_v:
+	DEFB	$00,$F3,$00,$9F,$0C,$E1,$60,$0F
+	DEFB	$12,$C0,$90,$07,$0F,$A0,$E0,$0D
+	DEFB	$59,$00,$32,$00,$73,$00,$9E,$00
+	DEFB	$19,$80,$38,$01,$7F,$00,$FE,$00
+	DEFB	$24,$80,$4C,$01,$30,$80,$0C,$01
+	DEFB	$19,$80,$D8,$03,$7F,$00,$FA,$00
+	DEFB	$4A,$00,$A6,$00,$12,$80,$90,$01
+	DEFB	$16,$C0,$D0,$07,$00,$E9,$00,$2F
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$0C,$F3,$60,$9F,$12,$E1,$90,$0F
+	DEFB	$0F,$F0,$E0,$1F,$59,$A0,$32,$0D
+	DEFB	$73,$80,$9E,$01,$19,$E0,$38,$07
+	DEFB	$7F,$80,$FE,$01,$24,$C0,$4C,$03
+	DEFB	$30,$C0,$0C,$03,$19,$E0,$D8,$07
+	DEFB	$7F,$80,$FA,$05,$4A,$B5,$A6,$59
+	DEFB	$12,$ED,$90,$6F,$16,$E9,$D0,$2F
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$0C,$F3,$60,$9F
+	DEFB	$12,$E1,$90,$0F,$0F,$F0,$E0,$1F
+	DEFB	$59,$A0,$32,$0D,$73,$80,$9E,$01
+	DEFB	$19,$E0,$38,$07,$7F,$80,$FE,$01
+	DEFB	$24,$C0,$4C,$03,$30,$C0,$0C,$03
+	DEFB	$19,$E0,$D8,$07,$7F,$80,$FA,$05
+	DEFB	$4A,$B5,$A6,$59,$12,$ED,$90,$6F
+	DEFB	$16,$E9,$D0,$2F,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$0C,$F3,$60,$9F,$12,$E1,$90,$0F
+	DEFB	$0F,$F0,$E0,$1F,$59,$A0,$32,$0D
+	DEFB	$73,$80,$9E,$01,$19,$E0,$38,$07
+	DEFB	$7F,$80,$FE,$01,$24,$C0,$4C,$03
+	DEFB	$30,$C0,$0C,$03,$19,$E0,$D8,$07
+	DEFB	$7F,$80,$FA,$05,$4A,$B5,$A6,$59
+	DEFB	$12,$ED,$90,$6F,$16,$E9,$D0,$2F
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$0C,$F3,$60,$9F
+	DEFB	$12,$E1,$90,$0F,$0F,$F0,$E0,$1F
+	DEFB	$59,$A0,$32,$0D,$73,$80,$9E,$01
+	DEFB	$19,$E0,$38,$07,$7F,$80,$FE,$01
+	DEFB	$24,$C0,$4C,$03,$30,$C0,$0C,$03
+	DEFB	$19,$E0,$D8,$07,$7F,$80,$FA,$05
+	DEFB	$4A,$B5,$A6,$59,$12,$ED,$90,$6F
+	DEFB	$16,$E9,$D0,$2F,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$0C,$F3,$60,$9F,$12,$E1,$90,$0F
+	DEFB	$0F,$F0,$E0,$1F,$59,$A0,$32,$0D
+	DEFB	$73,$80,$9E,$01,$19,$E0,$38,$07
+	DEFB	$7F,$80,$FE,$01,$24,$C0,$4C,$03
+	DEFB	$30,$C0,$0C,$03,$19,$E0,$D8,$07
+	DEFB	$7F,$80,$FA,$05,$4A,$B5,$A6,$59
+	DEFB	$12,$ED,$90,$6F,$16,$E9,$D0,$2F
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$0C,$F3,$60,$9F
+	DEFB	$12,$E1,$90,$0F,$0F,$F0,$E0,$1F
+	DEFB	$59,$A0,$32,$0D,$73,$80,$9E,$01
+	DEFB	$19,$E0,$38,$07,$7F,$80,$FE,$01
+	DEFB	$24,$C0,$4C,$03,$30,$C0,$0C,$03
+	DEFB	$19,$E0,$D8,$07,$7F,$80,$FA,$05
+	DEFB	$4A,$B5,$A6,$59,$12,$ED,$90,$6F
+	DEFB	$16,$E9,$D0,$2F,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$0C,$F3,$60,$9F,$12,$E1,$90,$0F
+	DEFB	$0F,$F0,$E0,$1F,$59,$A0,$32,$0D
+	DEFB	$73,$80,$9E,$01,$19,$E0,$38,$07
+	DEFB	$7F,$80,$FE,$01,$24,$C0,$4C,$03
+	DEFB	$30,$C0,$0C,$03,$19,$E0,$D8,$07
+	DEFB	$7F,$80,$FA,$05,$4A,$B5,$A6,$59
+	DEFB	$12,$ED,$90,$6F,$16,$E9,$D0,$2F
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$00,$FF,$00,$FF
+	DEFB	$00,$FF,$00,$FF,$0C,$F3,$60,$9F
+	DEFB	$12,$E1,$90,$0F,$0F,$F0,$E0,$1F
+	DEFB	$59,$A0,$32,$0D,$73,$80,$9E,$01
+	DEFB	$19,$E0,$38,$07,$7F,$80,$FE,$01
+	DEFB	$24,$C0,$4C,$03,$30,$C0,$0C,$03
+	DEFB	$19,$E0,$D8,$07,$7F,$80,$FA,$05
+	DEFB	$4A,$B5,$A6,$59,$12,$ED,$90,$6F
+	DEFB	$16,$E9,$D0,$2F,$00,$FF,$00,$FF
