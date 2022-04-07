@@ -60,15 +60,15 @@ LOOP:			;HALT
 			;call z, CheckForHit
 
 
-			halt
+			;halt
 			ld ix, BUGS_TABLE
 			ld b, BT_LENGTH
 
 bugloop			
 			push ix
 
-			ld a,b
-			out (254),a
+;			ld a,b
+;			out (254),a
 
 			call show
 			pop ix
@@ -79,11 +79,16 @@ bugloop
 		
 			call Mouse		; get Mouse_Buttons and Mouse_Coords
 			call _print		; translate coords into screen row/column
-		xor a
-		out (254), a
+;		xor a
+;		out (254), a
 			call Reticule
-		ld a,7
-		out (254), a
+;		ld a,7
+;		out (254), a
+
+			;halt
+			call ShowBuffer
+			;halt
+			;call SetBuffer
 
 			JR LOOP
 
@@ -129,7 +134,11 @@ Clicker:		ld a, (Mouse_Buttons)
 			and 3
 			out (254), a
 			cp 2
-			jp z, ShowBuffer
+			ld a, 0x01
+			ld (petesprite), a
+			ret z
+			ld a, 0xFE
+			ld (petesprite), a
 			ret
 
 CheckForHit:		ret
@@ -156,7 +165,7 @@ move:			ld a,(ix+1)		; alien movement direction.
 
 ; Move alien left.
 moval			ld a,(ix+3)		; get y coordinate.
-			sub 1			; move up.
+			sub 2			; move up.
 			ld (ix+3),a		
 			cp (ix+4)		; reached mimimum yet?
 			jr z,movax		; yes - change direction.
@@ -164,7 +173,7 @@ moval			ld a,(ix+3)		; get y coordinate.
 			ret
 ; Move alien right.
 movar			ld a,(ix+3)		; get y coordinate.
-			add a,1			; move down.
+			add a,16			; move down.
 			ld (ix+3),a
 			cp (ix+5)		; reached maximum yet?
 			jr nc,movax		; yes - change direction
@@ -176,14 +185,14 @@ movav			rra			; test direction.
 
 ; Move alien up.
 movau			ld a,(ix+2)		; get x coordinate.
-			sub 1			; move left.
+			sub 2			; move left.
 			ld (ix+2),a
 			cp (ix+4)		; reached mimimum yet?
 			jr z,movax		; yes - change direction.
 			ret
 ; Move alien down.
 movad			ld a,(ix+2)		; get x coordinate.
-			add a,1			; move right.
+			add a,7			; move right.
 			ld (ix+2),a		; new coordinate.
 			cp (ix+5)		; reached maximum yet?
 			jr nc,movax		; yes - change direction.
@@ -210,26 +219,26 @@ ShowBG:
 		ret
 SetBuffer:
 		ld hl, BRICK
-		ld de, 0x6000
+		ld de, 0xC000
 		ld bc, 6144
 		ldir
 		ret
 ShowBuffer:
-		ld hl, 0x6000
+		ld hl, 0xC000
 		ld de, 0x4000
 		ld bc, 6144
 		ldir
-		di
-		halt
+;		di
+;		halt
 		ret
 
 Reticule:
-			ld bc,(RET_XY+2)		; OLD position
-			call LOCATE			; get screen address in HL
+;			ld bc,(RET_XY+2)		; OLD position
+;			call LOCATE			; get screen address in HL
 
-			call UND8x8			; HL will be preserved
+;			call UND8x8			; HL will be preserved
 			ld bc,(RET_XY)			; NEW position
-			ld (RET_XY+2),bc		; update OLD position
+;			ld (RET_XY+2),bc		; update OLD position
 			call LOCATE			; get screen address in HL
 ;			ld a, %00010000			; paint it red!
 ;			ld (de), a
@@ -268,12 +277,12 @@ display:
 			ld b, a
 			call Get_Char_Address		; get screen address in HL
 
-			ld de, udr			; stack the return address as if we 
-			push de				; were doing call to a routine.
-			ld e, (ix+11)			; 
-			ld d, (ix+12)			; DE e.g. call UND16x16
-			push de				; stack the sprite routine jump addr
-			ret
+;			ld de, udr			; stack the return address as if we 
+;			push de				; were doing call to a routine.
+;			ld e, (ix+11)			; 
+;			ld d, (ix+12)			; DE e.g. call UND16x16
+;			push de				; stack the sprite routine jump addr
+;			ret
 udr:						
 			;ld a, (FRAMES)
 			;and a
@@ -348,6 +357,7 @@ d_get_y:		; get y offest
 			ex de,hl			; DE=total offset
 
 
+
 noffset:		pop bc				; BC=row/column
 			call Get_Char_Address		; HL=screen address
 			ld c, (ix+7)			; 
@@ -365,6 +375,7 @@ dr:							; return from jump
 FRAMES		equ 0x5C78
 PJ_XY		dw 0x1400, 0x4001
 ENEMY		dw 0x5A00, 0x5A00
+
 POSXY		dw 0x4840, 0x0000
 RET_XY		dw 0x0000, 0x0000, 0x0000
 X_PositionBits: defb 128,64,32,16,8,4,2,1
@@ -395,7 +406,7 @@ petesprite	defb 0x01,0x02,0,20*8, 0,29*8, 192
 		defw 0x0000, 0x0000
 
 
-SPRITE_TABLE:	DEFW drutt, pj
+;SPRITE_TABLE:	DEFW drutt, pj
 BUFFER:		EQU 0X6000	;BLOCK 	32*192/8,0xFF	; 768 bytes to store screen display buffer
 		;BLOCK 	32,0xFF		; 32 bytes to store 16x16 display buffer
 
@@ -482,18 +493,18 @@ eostry  equ $
 	include _sprite-engine.asm
 
 	include _mouse.asm
-	include _hellaplot.asm
+	;include _hellaplot.asm
 
 	include gfx/pointer.asm
-	include gfx/hearticon.asm
-	include gfx/hand.asm
-	include gfx/pj.asm
+	;include gfx/hearticon.asm
+	;include gfx/hand.asm
+	;include gfx/pj.asm
 	include gfx/pj_v.asm
-	include gfx/drutt.asm
+	;include gfx/drutt.asm
 	include gfx/drutt_v.asm
 	include gfx/droog.asm
 	include gfx/drtest.asm
-LB3	incbin gfx/lovebugs3.scr
+LB3	;incbin gfx/lovebugs3.scr
 BRICK	incbin gfx/brick.scr
 
 

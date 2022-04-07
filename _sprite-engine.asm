@@ -118,15 +118,16 @@ MSKD8x8:
 
 
 
-MSKD8x1:	ld c, (hl)		; get screen data in C
+MSKD8x1:
+		set 7,h
+		ld c, (hl)		; get screen data in C
 		ld a, (ix+1)		; get mask data in A
 		AND c			; AND the mask over the screen data (i.e. punch out a hole)
-		;set 5,h
-		;ld (hl), c		; copy screen data to buffer
-		;res 5,h
 		ld c,(ix)		; get sprite data in C
 		xor c			; XOR the sprite over the masked screen data (fill the hole with sprite)
-		ld (hl),a		; update screen [1]
+		ld (hl), a		; copy screen data to buffer
+		res 7,h
+		;ld (hl),a		; update screen [1]
 		inc ix			; move to next byte, and repeat; etc.
 		inc ix			; skip over interwoven mask bytes
 		;inc iy
@@ -264,192 +265,192 @@ UND24x16:
 		ret
 
 UND32x8:
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
@@ -459,145 +460,145 @@ UND32x8:
 		ret
 
 UND24x8:
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
@@ -630,98 +631,98 @@ UND16x16:
 
 UND16x8:	;ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
 _UND16x8:
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc l
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
 		dec l
@@ -734,52 +735,52 @@ SPR8x1:		ret
 UND8x8:
 		push hl
 
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		inc h
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 
 		pop hl
 		ret
 
 SPR8x1b:
-		set 5,h
+		set 7,h
 		ld a,(hl)		; get sprite data in C
-		res 5,h
+		res 7,h
 		ld (hl),a		; update screen [1]
 		ret
