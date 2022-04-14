@@ -38,9 +38,9 @@ ZER_X:			LD L,A
 			JR NM_X
 MX_PL:			ADD A,L
 			JR C,BEX_Z
-			CP 0xFE 		; MAXIMUM X
+			CP 0xFF 		; MAXIMUM X
 			JR C,BEX_B
-BEX_Z:			LD A,0xFE 		; MAXIMUM X
+BEX_Z:			LD A,0xFF 		; MAXIMUM X
 BEX_B:			LD L,A
 
 NM_X:			LD B,0xFF		; The mouse port for Y
