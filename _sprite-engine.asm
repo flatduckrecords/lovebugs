@@ -1,6 +1,53 @@
 	;include _rebuffer.asm
 
 ;; Render 16x16 masked sprite ;;
+
+MSKD_BB_64x64:
+
+		push hl
+		call MSKD_BB_64x8		; top two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_64x8		; bottom two quadrants
+		pop hl
+		ret
+
+MSKD_BB_24x16:
+		push hl
+		call MSKD_BB_24x8
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD_BB_24x8
+		pop hl
+		ret
+
+
 MSKD24x32:	
 		push hl
 		call MSKD24x8		; top two quadrants
@@ -27,15 +74,15 @@ MSKD32x16:
 		call MSKD32x8		; bottom two quadrants
 		pop hl
 		ret
-;MSKD24x16:	
-;		push hl
-;		call MSKD24x8		; top two quadrants
-;		pop hl
-;		call Next_Char_Line
-;		push hl
-;		call MSKD24x8		; bottom two quadrants
-;		pop hl
-;		ret
+MSKD24x16:	
+		push hl
+		call MSKD24x8		; top two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call MSKD24x8		; bottom two quadrants
+		pop hl
+		ret
 MSKD16x24:	
 		push hl
 		call MSKD16x8		; top two
@@ -59,6 +106,55 @@ MSKD16x16:
 		pop hl
 		ret
 
+MSKD_BB_24x8:	ld b,8
+
+		; on entry HL is pointing to display file
+		set 7, h		; HL now pointing to buffer
+		ld de, DBLBFFR-BUFFER	; DE=$300 (buffer length)
+		add hl, de		; HL now pointing to back buffer
+		
+_MSKD_BB_24x8:	call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc h
+		dec l
+		dec l
+		djnz _MSKD_BB_24x8
+		ret
+MSKD_BB_64x8:	ld b,8
+
+		; on entry HL is pointing to display file
+		set 7, h		; HL now pointing to buffer
+		ld de, DBLBFFR-BUFFER	; DE=$300 (buffer length)
+		add hl, de		; HL now pointing to back buffer
+		
+_MSKD_BB_64x8:	call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc l
+		call MSKD_BB_8x1
+		inc h
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		djnz _MSKD_BB_64x8
+		ret
 MSKD32x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
 		
 _MSKD32x8:	call MSKD8x1
@@ -73,6 +169,14 @@ _MSKD32x8:	call MSKD8x1
 		dec l
 		dec l
 		djnz _MSKD32x8
+		ret
+
+SPR24x16:
+		push hl
+		call SPR24x8
+		pop hl
+		call Next_Char_Line
+		call SPR24x8
 		ret
 MSKD24x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
 		
@@ -117,6 +221,17 @@ MSKD8x8:
 		ret
 
 
+MSKD_BB_8x1:
+		ld c, (hl)		; get screen data in C
+		ld a, (ix+1)		; get mask data in A
+		AND c			; AND the mask over the screen data (i.e. punch out a hole)
+		ld c,(ix)		; get sprite data in C
+		xor c			; XOR the sprite over the masked screen data (fill the hole with sprite)
+		ld (hl), a		; copy screen data to buffer
+		inc ix			; move to next byte, and repeat; etc.
+		inc ix			; skip over interwoven mask bytes
+
+		ret
 MSKD8x1:
 		set 7,h
 		ld c, (hl)		; get screen data in C
@@ -167,42 +282,42 @@ MSKD8x1:
 ;		;inc iy
 ;		ret
 
-;SPR64x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
-;_SPR64x8:	call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc h
-;		dec l
-;		dec l
-;		dec l
-;		dec l
-;		dec l
-;		dec l
-;		dec l
-;		djnz _SPR64x8
-;		ret
+SPR64x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
+_SPR64x8:	call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc h
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		dec l
+		djnz _SPR64x8
+		ret
 
-;SPR64x64:	ld b,8
-;_SPR64x64:	push bc
-;		push hl
-;		call SPR64x8
-;		pop hl
-;		call Next_Char_Line
-;		pop bc
-;		djnz _SPR64x64
-;		ret
+SPR64x64:	ld b,8
+_SPR64x64:	push bc
+		push hl
+		call SPR64x8
+		pop hl
+		call Next_Char_Line
+		pop bc
+		djnz _SPR64x64
+		ret
 
 ;SPR24x32:	
 ;		push hl
@@ -223,17 +338,17 @@ MSKD8x1:
 ;		ret
 
 
-;SPR24x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
-;_SPR24x8:	call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc l
-;		call SPR8x1
-;		inc h
-;		dec l
-;		dec l
-;		djnz _SPR24x8
-;		ret
+SPR24x8:	ld b,8			;; ?? can we do the loop in a way that doesn't trash B? would save on push/pops! ?? ;;
+_SPR24x8:	call SPR8x1
+		inc l
+		call SPR8x1
+		inc l
+		call SPR8x1
+		inc h
+		dec l
+		dec l
+		djnz _SPR24x8
+		ret
 
 SCRN16x8:	call SCRN8x8
 		inc l
@@ -287,11 +402,11 @@ SCOREBOARD:
 		sub e
 		neg
 		ld (remainder), a
-		ld a, c
+		ld a,0
+		adc c				; carry set if remainder > 0 (I think!)
+		;ld a, c
 
-;		ld hl, 0x4000 + 31
-;		ld hl, BUFFER + 31		
-;		call Next_Char_Line_buff
+
 
 		ld hl, DBLBFFR + 31
 		
@@ -310,6 +425,7 @@ SCOREBOARD:
 		djnz 1B
 
 2:		
+		ld de, full
 		ld a, (remainder)
 		srl a					; divide by two becuase 8 into 16
 		cp 0					; check for partial fill
@@ -317,28 +433,29 @@ SCOREBOARD:
 
 		push bc
 
+		ld de, fill
 		ld b, a					; calculate sprite offset
 		xor a
+		sub a, 16
 4:		add a, 16
 		djnz 4B
 		ld b,0
 		ld c,a
-		ld de, fill
 		ex de, hl
 		add hl, bc
 		ex de, hl
-
-		call TTLSR8x8
-		call Next_Char_Line_buff
-		call TTLSR8x8
-		call Next_Char_Line_buff
-
 		pop bc
+
+3:		call TTLSR8x8
+		call Next_Char_Line_buff
+		call TTLSR8x8
+		call Next_Char_Line_buff
+
 		
-3:		ld a, c
+		ld a, c
 		cp 0
 		jr z, 2F
-		ld de, fill + (7*16)			; sprite for a filled segment
+		ld de, full			; sprite for a filled segment
 		ld b, a
 1:		push de
 		call TTLSR8x8
@@ -348,9 +465,10 @@ SCOREBOARD:
 		pop de
 		djnz 1B
 
-2:;		call Prev_Char_Line
-;		ld de, metrebot
-;		call TTLSR8x8
+
+2:		ld hl, 0xE8FF
+		ld de, metrebot
+		call TTLSR8x8
 
 		ld de, metretop 
 		ld hl, DBLBFFR + 31
@@ -396,48 +514,8 @@ SCOREBOARD:
 		pop bc
 		ret
 
-TOTALISER:	
-;		push bc
-;		push de
-;		push hl
-;
-;		ld de, fill
-;		ld hl, 0x4000 + 31
-;		ld hl, BUFFER + 31
-;		ld hl, DBLBFFR + 31 ;2048
-;
-;		call Next_Char_Line
-;
-;		ld b, 7
-;1:		call TTLSR8x8
-;		call Next_Char_Line
-;		djnz 1B
-;
-;		ld hl, DBLBFFR + 31 + 2048
-;
-;		ld b, 8
-;1:		call TTLSR8x8
-;		call Next_Char_Line
-;		djnz 1B
-;
-;		ld hl, DBLBFFR + 31 + 4096
-;
-;		ld b, 7
-;1:		call TTLSR8x8
-;		call Next_Char_Line
-;		djnz 1B
-;
-;		ld b, 8
-;1:		call TTLSR8x8
-;		call Next_Char_Line
-;		djnz 1B
-
-
+TOTALISER:
 		call SCOREBOARD
-
-;		pop hl
-;		pop de
-;		pop bc
 		ret
 
 TTLSR8x8:
@@ -485,6 +563,15 @@ UND24x32:
 		call Next_Char_Line
 		push hl
 		call UND24x8		; 3rd two quadrants
+		pop hl
+		call Next_Char_Line
+		push hl
+		call UND24x8		; bottom two quadrants
+		pop hl
+		ret
+UND24x16:	
+		push hl
+		call UND24x8		; top two quadrants
 		pop hl
 		call Next_Char_Line
 		push hl
@@ -989,6 +1076,28 @@ SCRN8x1:
 		inc ix			; skip over interwoven mask bytes
 		ret
 
+HEAL24x16:
+
+		; [ 8][16][24]
+		; [ 8][16][24]
+
+		push hl
+		call HEAL8x8		; 8
+		inc l
+		call HEAL8x8		; 16
+		inc l
+		call HEAL8x8		; 24
+
+		call Next_Char_Line
+
+		call HEAL8x8		; 8
+		dec l
+		call HEAL8x8		; 16
+		dec l
+		call HEAL8x8		; 24
+
+		pop hl
+		ret
 HEAL32x16:
 
 		; [ 8][16][24][32]
@@ -1305,9 +1414,8 @@ SHOW8x8:
 		pop hl
 		ret
 
-;SPR8x1b:
-;		set 7,h
-;		ld a,(hl)		; get sprite data in C
-;		res 7,h
-;		ld (hl),a		; update screen [1]
-;		ret
+SPR8x1:
+		ld a,(ix)		; get sprite data in C
+		ld (hl),a		; update screen [1]
+		inc ix			; move to next byte
+		ret
